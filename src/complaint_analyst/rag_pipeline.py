@@ -7,10 +7,7 @@ from typing import List, Dict, Any
 # --- Configuration ---
 VECTOR_STORE_PATH = 'vector_store'
 EMBEDDING_MODEL_NAME = 'sentence-transformers/all-MiniLM-L6-v2'
-# We are using a much smaller model for development to avoid large downloads.
-# This model is not a great instruction-follower but allows the pipeline to run end-to-end.
-# The final version should use a larger, more capable model like Mistral-7B.
-LLM_MODEL_NAME = 'sshleifer/distilgpt2'
+LLM_MODEL_NAME = 'mistralai/Mistral-7B-Instruct-v0.1'
 
 class RAGPipeline:
     def __init__(self):
@@ -47,27 +44,23 @@ class RAGPipeline:
         retrieved_docs = self.retriever.get_relevant_documents(question)
         context_str = self._format_context(retrieved_docs)
         prompt_template = f"""
-        Answer the following question based on the context provided.
+        [INST]
+        You are an expert financial analyst assistant. Your task is to answer questions about customer complaints.
+        Use ONLY the following retrieved complaint excerpts to formulate your answer.
+        Do not use any prior knowledge. If the context doesn't contain the answer, state that you don't have enough information.
+        Your answer should be concise and directly address the user's question.
 
-        Context:
+        CONTEXT:
         {context_str}
-
-        Question:
+        
+        QUESTION:
         {question}
-
+        [/INST]
         Answer:
         """
         print("Generating answer...")
         generated_output = self.llm_pipeline(prompt_template)
-        full_generated_text = generated_output[0]['generated_text']
-        # The model will often repeat the prompt, so we find the "Answer:" part and take what's after it.
-        answer_marker = "Answer:"
-        answer_pos = full_generated_text.find(answer_marker)
-        if answer_pos != -1:
-            answer = full_generated_text[answer_pos + len(answer_marker):].strip()
-        else:
-            # Fallback if the marker isn't found
-            answer = full_generated_text 
+        answer = generated_output[0]['generated_text'].split('[/INST]')[1].strip()
         
         return {
             "answer": answer,
