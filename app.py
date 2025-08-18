@@ -12,6 +12,7 @@ else:
     # This imports our fast, simulated pipeline.
     from src.complaint_analyst.mock_rag_pipeline import MockRAGPipeline as ComplaintPipeline
 
+print("I'm here")
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
