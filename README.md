@@ -1,10 +1,10 @@
-# CrediTrust Financial - Complaint Analyst AI
+# Financial Complaint Analyst AI
 
-This project is an internal AI tool designed to transform raw, unstructured customer complaint data into a strategic asset for CrediTrust Financial. It provides a simple chat interface for internal stakeholders (Product, Support, Compliance) to ask plain-English questions about customer complaints and receive synthesized, evidence-backed answers in seconds.
+This project is an internal AI tool designed to transform raw, unstructured customer complaint data into a strategic asset for financial firms. It provides a simple chat interface for internal stakeholders (Product, Support, Compliance) to ask plain-English questions about customer complaints and receive synthesized, evidence-backed answers in seconds.
 
 ## Problem
 
-Internal teams at CrediTrust face significant bottlenecks in understanding customer feedback:
+Internal teams at financial firms face significant bottlenecks in understanding customer feedback:
 - **Product Managers** struggle to identify emerging issues.
 - **Customer Support** is overwhelmed by complaint volume.
 - **Compliance & Risk** teams are reactive to potential issues.
@@ -31,7 +31,7 @@ The system works in three steps:
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/sanoy-si/financial-complaint-analyzer.git
-    cd credetrust-complaint-analyzer
+    cd financial-complaint-analyzer
     ```
 
 2.  **Install dependencies using Poetry:**
@@ -94,10 +94,10 @@ Here are a few visuals from the project, highlighting key stages from data analy
 
 The initial analysis was performed in a Jupyter Notebook to understand the distribution of complaints across different financial products. This step was crucial for identifying the target data for our AI and confirming the business need. The visualization below shows the volume of complaints for the top product categories.
 
-![EDA - Product Distribution](./images/eda_product_distribution.png)
+![EDA - Product Distribution](./images/eda_product_distribution.jpg)
 
 ### 2. Interactive Chat Application
 
 The final application is an intuitive chat interface built with Streamlit. The screenshot below demonstrates the user interaction, where the AI provides a synthesized, multi-point answer to aquestion.
-![Chat Application UI](./images/app_screenshot1.png)
-![Chat Application UI](./images/app_screenshot2.png)
+![Chat Application UI](./images/app_screenshot1.jpg)
+![Chat Application UI](./images/app_screenshot2.jpg)
