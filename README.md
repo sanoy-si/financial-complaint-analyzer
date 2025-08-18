@@ -85,3 +85,19 @@ credetrust-complaint-analyzer/
 ├── README.md
 └── pyproject.toml
 ```
+
+## 🚀 Project Showcase
+
+Here are a few visuals from the project, highlighting key stages from data analysis to the final interactive application.
+
+### 1. Exploratory Data Analysis (EDA)
+
+The initial analysis was performed in a Jupyter Notebook to understand the distribution of complaints across different financial products. This step was crucial for identifying the target data for our AI and confirming the business need. The visualization below shows the volume of complaints for the top product categories.
+
+![EDA - Product Distribution](./images/eda_product_distribution.png)
+
+### 2. Interactive Chat Application
+
+The final application is an intuitive chat interface built with Streamlit. The screenshot below demonstrates the user interaction, where the AI provides a synthesized, multi-point answer to aquestion.
+![Chat Application UI](./images/app_screenshot1.png)
+![Chat Application UI](./images/app_screenshot2.png)
