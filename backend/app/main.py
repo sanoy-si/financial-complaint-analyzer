@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routers import auth, chat, documents, health, projects
+from app.api.routers import auth, chat, documents, health, projects, public
 from app.core.config import get_settings
 
 
@@ -26,6 +26,7 @@ def create_app() -> FastAPI:
     app.include_router(projects.router, prefix=settings.api_v1_prefix)
     app.include_router(documents.router, prefix=settings.api_v1_prefix)
     app.include_router(chat.router, prefix=settings.api_v1_prefix)
+    app.include_router(public.router, prefix=settings.api_v1_prefix)
     return app
 
 
