@@ -13,10 +13,12 @@ def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=f"{settings.product_name} API", version="0.1.0")
 
+    # Bearer tokens (not cookies) carry auth, so credentials mode isn't needed;
+    # that also lets us use a wildcard origin for the cross-site widget.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
-        allow_credentials=True,
+        allow_credentials="*" not in settings.cors_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )

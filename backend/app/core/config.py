@@ -24,7 +24,10 @@ class Settings(BaseSettings):
 
     # --- api ---
     api_v1_prefix: str = "/api/v1"
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    # The embeddable widget is served from arbitrary third-party domains, so the
+    # default is permissive; per-project domain allowlisting provides the real
+    # restriction. Lock this down to known origins in a private deployment.
+    cors_origins: list[str] = Field(default_factory=lambda: ["*"])
 
     # --- database ---
     database_url: str = Field(
