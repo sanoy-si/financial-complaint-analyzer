@@ -1,0 +1,29 @@
+# Render blueprint: a managed Postgres (with pgvector) + the FastAPI backend.
+# The Next.js frontend deploys separately on Vercel (see apps/web).
+databases:
+  - name: grounded-db
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: grounded-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: grounded-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: EMBEDDING_PROVIDER
+        value: hash
+      - key: LLM_PROVIDER
+        value: mock
+      - key: CORS_ORIGINS
+        value: '["*"]'
+    preDeployCommand: alembic upgrade head
