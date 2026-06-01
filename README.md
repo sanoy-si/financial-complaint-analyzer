@@ -1,103 +1,94 @@
-# Financial Complaint Analyst AI
+# Grounded — chat with your documents
 
-This project is an internal AI tool designed to transform raw, unstructured customer complaint data into a strategic asset for financial firms. It provides a simple chat interface for internal stakeholders (Product, Support, Compliance) to ask plain-English questions about customer complaints and receive synthesized, evidence-backed answers in seconds.
+Grounded turns any PDF or website into a **grounded** chatbot: it ingests your
+content, answers questions using only your sources (with citations), and gives you
+an embeddable `<script>` widget to drop on your own site.
 
-## Problem
+The engine is fully generic ("chat with my docs"), and its flagship demo targets
+**finance & compliance** — making sense of customer complaints, policies, and
+filings — building on this project's original CFPB-complaint analysis work
+(see `notebooks/`).
 
-Internal teams at financial firms face significant bottlenecks in understanding customer feedback:
-- **Product Managers** struggle to identify emerging issues.
-- **Customer Support** is overwhelmed by complaint volume.
-- **Compliance & Risk** teams are reactive to potential issues.
+> Evolved from a single-purpose RAG notebook into a small multi-tenant product.
+> Earlier history (the CFPB EDA + prototype) is preserved under `notebooks/` and
+> `src/`.
 
-This tool aims to solve these problems by leveraging Retrieval-Augmented Generation (RAG).
+## Highlights
 
-## Solution Architecture (RAG)
+- **Pluggable, no lock-in.** A tiny `get_embedder()` / `get_llm()` factory selects
+  providers by env var. Embeddings default to a **local** model (documents never
+  leave your server); generation defaults to a deterministic mock for a free demo,
+  and swaps to OpenAI/Groq/etc. with one variable.
+- **Multi-tenant.** Users → projects (chatbots) → documents → pgvector-backed
+  chunks, isolated per project.
+- **Embeddable widget.** One `<script>` tag renders a Shadow-DOM chat bubble that
+  calls a public, key-scoped API with per-project domain allowlisting and rate
+  limiting.
+- **Standard practice.** JWT auth, Pydantic validation, SSRF-guarded URL
+  ingestion, Alembic migrations, Docker Compose, GitHub Actions CI, and a real
+  test suite.
 
-The system works in three steps:
-1.  **Retrieve:** When a user asks a question, the system searches a specialized vector database to find the most relevant customer complaint narratives.
-2.  **Augment:** The user's question and the retrieved complaints are combined into a detailed prompt.
-3.  **Generate:** A Large Language Model (LLM) receives the prompt and generates a concise, human-readable answer based *only* on the provided complaints.
+## Architecture
 
+```
+Next.js (Vercel)  ─┐
+embed widget       ─┼──▶  FastAPI (Render)  ──▶  Postgres + pgvector
+                   │            ├─ auth (JWT) / projects
+                   │            ├─ ingestion (PDF/URL → chunk → embed)
+                   │            ├─ rag (pluggable providers, retrieval, citations)
+                   │            └─ public widget API (key + rate limit)
+```
 
-## Project Setup
+| Area | Stack |
+|------|-------|
+| Frontend | Next.js (App Router), TypeScript |
+| Backend | FastAPI, SQLAlchemy, Pydantic |
+| Vector store | Postgres + pgvector (JSON fallback for tests) |
+| RAG | retrieval pipeline, local/OpenAI/Groq providers |
+| Infra | Docker Compose, Render (API+DB), Vercel (web), GitHub Actions |
 
-### Prerequisites
-- Python 3.10+
-- Poetry
-- Git
+## Repo layout
 
-### Installation
+```
+backend/        FastAPI app, RAG engine, migrations, tests
+apps/web/       Next.js dashboard + landing
+apps/widget/    embeddable widget demo + docs (served from the backend)
+infra/          Render blueprint
+notebooks/, src/  original CFPB analysis (provenance)
+docker-compose.yml
+```
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/sanoy-si/financial-complaint-analyzer.git
-    cd financial-complaint-analyzer
-    ```
+## Quickstart (local, one command)
 
-2.  **Install dependencies using Poetry:**
-    ```bash
-    poetry install
-    ```
-   
-
-3.  **Download the data:**
-    Download the dataset from the [CFPB Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/search/api/v1/?size=0&data_received_max=2023-11-20&data_received_min=2023-08-21&field=all&format=csv) and save it as `complaints.csv` inside the `data/raw/` directory.
-
----
-
-## How to Run the Project
-
-The project is divided into several steps. Run them in order.
-
-### 1. Data Preprocessing
-Run the EDA notebook to understand and clean the data. This will generate the `filtered_complaints.csv` file needed for the next step.
 ```bash
-poetry run jupyter notebook notebooks/01_eda_and_preprocessing.ipynb
+cp backend/.env.example backend/.env   # defaults work offline
+docker compose up --build
 ```
 
-### 2. Create the Vector Store 
-Run the indexing script. This will read the processed data, create embeddings, and save the vector store.
+- API → http://localhost:8000 (docs at `/docs`, health at `/health`)
+- Web → http://localhost:3000
+
+Defaults run **fully offline**: local hash embeddings + a deterministic mock
+generator, so there's no API key or cost. Point `LLM_PROVIDER` / `LLM_API_KEY` at a
+real model for production-quality answers.
+
+## Backend dev / tests
+
 ```bash
-poetry run python -m src.complaint_analyst.vector_store
-```
-*(Note: You can run a script inside a package using the `-m` flag)*
-
-### 3. Run the Chat Application 
-Launch the Streamlit web application.
-```bash
-poetry run streamlit run app.py
-```
-Open your browser to the local URL provided by Streamlit (usually `http://localhost:8501`).
-
----
-## Project Structure
-```
-credetrust-complaint-analyzer/
-├── .github/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-├── src/
-│   └── complaint_analyst/
-├── vector_store/
-├── app.py
-├── README.md
-└── pyproject.toml
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+DATABASE_URL=sqlite:// pytest -q
 ```
 
-## 🚀 Project Showcase
+## Deploy
 
-Here are a few visuals from the project, highlighting key stages from data analysis to the final interactive application.
+- **Backend + DB:** Render blueprint at `infra/render.yaml` (Docker + managed
+  Postgres with pgvector; runs `alembic upgrade head` on deploy).
+- **Frontend:** deploy `apps/web` to Vercel; set `NEXT_PUBLIC_API_BASE` to the API URL.
 
-### 1. Exploratory Data Analysis (EDA)
+## Security notes
 
-The initial analysis was performed in a Jupyter Notebook to understand the distribution of complaints across different financial products. This step was crucial for identifying the target data for our AI and confirming the business need. The visualization below shows the volume of complaints for the top product categories.
-
-![EDA - Product Distribution](./images/eda_product_distribution.jpg)
-
-### 2. Interactive Chat Application
-
-The final application is an intuitive chat interface built with Streamlit. The screenshot below demonstrates the user interaction, where the AI provides a synthesized, multi-point answer to aquestion.
-![Chat Application UI](./images/app_screenshot1.jpg)
-![Chat Application UI](./images/app_screenshot2.jpg)
+- Secrets only via env (`.env` is git-ignored); `.env.example` documents them.
+- URL ingestion blocks private/loopback/metadata addresses (SSRF).
+- The widget public key is non-secret; restrict by domain allowlist + rate limit.
