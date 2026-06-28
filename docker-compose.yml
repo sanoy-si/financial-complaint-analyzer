@@ -36,6 +36,9 @@ services:
     build: ./apps/web
     environment:
       NEXT_PUBLIC_API_BASE: http://localhost:8000
+      # Docker sets HOSTNAME to the container id; force Next.js to bind all
+      # interfaces so the host can reach it.
+      HOSTNAME: "0.0.0.0"
     depends_on:
       - backend
     ports:
