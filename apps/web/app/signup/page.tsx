@@ -32,23 +32,33 @@ export default function SignupPage() {
   }
 
   return (
-    <main className="container" style={{ maxWidth: 400, paddingTop: 64 }}>
-      <h1>Create your account</h1>
-      <form onSubmit={onSubmit} className="card">
-        <label>Email</label>
-        <input className="input" type="email" value={email}
-          onChange={(e) => setEmail(e.target.value)} required />
-        <label style={{ marginTop: 12, display: "block" }}>Password</label>
-        <input className="input" type="password" value={password}
-          onChange={(e) => setPassword(e.target.value)} required />
-        {error && <p className="error">{error}</p>}
-        <button className="btn" type="submit" disabled={loading} style={{ marginTop: 16 }}>
-          {loading ? "Creating…" : "Sign up"}
-        </button>
-      </form>
-      <p className="muted" style={{ marginTop: 12 }}>
-        Already have an account? <Link href="/login">Log in</Link>
-      </p>
+    <main className="auth-wrap">
+      <div className="auth-card fade-up">
+        <Link href="/" className="brand" style={{ justifyContent: "center", marginBottom: 8 }}>
+          <span className="logo" /> Grounded
+        </Link>
+        <h1 style={{ fontSize: 26, textAlign: "center" }}>Create your account</h1>
+        <p className="muted center" style={{ marginTop: 4 }}>Spin up your first chatbot in minutes</p>
+        <form onSubmit={onSubmit} className="stack" style={{ marginTop: 24 }}>
+          <div className="field">
+            <label className="label">Email</label>
+            <input className="input" type="email" value={email}
+              onChange={(e) => setEmail(e.target.value)} required placeholder="you@company.com" />
+          </div>
+          <div className="field">
+            <label className="label">Password</label>
+            <input className="input" type="password" value={password}
+              onChange={(e) => setPassword(e.target.value)} required placeholder="At least 8 characters" />
+          </div>
+          {error && <p className="error">{error}</p>}
+          <button className="btn btn-primary btn-block btn-lg" type="submit" disabled={loading}>
+            {loading ? "Creating…" : "Create account"}
+          </button>
+        </form>
+        <p className="muted center" style={{ marginTop: 18 }}>
+          Already have an account? <Link href="/login" style={{ color: "var(--violet)", fontWeight: 600 }}>Log in</Link>
+        </p>
+      </div>
     </main>
   );
 }
