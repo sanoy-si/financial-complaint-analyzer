@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import { api, setToken } from "@/lib/api";
 
 export default function LoginPage() {
@@ -31,7 +32,7 @@ export default function LoginPage() {
     <main className="auth-wrap">
       <div className="auth-card fade-up">
         <Link href="/" className="brand" style={{ justifyContent: "center", marginBottom: 8 }}>
-          <span className="logo" /> Grounded
+          <Logo /> Grounded
         </Link>
         <h1 style={{ fontSize: 26, textAlign: "center" }}>Welcome back</h1>
         <p className="muted center" style={{ marginTop: 4 }}>Log in to your workspace</p>

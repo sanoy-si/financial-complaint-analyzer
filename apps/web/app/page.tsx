@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 function Icon({ path }: { path: string }) {
   return (
@@ -23,7 +24,7 @@ export default function LandingPage() {
     <main>
       <nav className="nav on-dark">
         <div className="nav-inner">
-          <div className="brand"><span className="logo" /> Grounded</div>
+          <div className="brand"><Logo /> Grounded</div>
           <div className="row">
             <Link className="btn btn-ghost on-dark" href="/login">Log in</Link>
             <Link className="btn btn-primary" href="/signup">Get started</Link>
@@ -120,7 +121,7 @@ export default function LandingPage() {
 
       <footer className="footer">
         <div className="container row" style={{ justifyContent: "space-between" }}>
-          <div className="brand" style={{ fontSize: 16 }}><span className="logo" /> Grounded</div>
+          <div className="brand" style={{ fontSize: 16 }}><Logo /> Grounded</div>
           <span>A deterministic, no-lock-in RAG platform.</span>
         </div>
       </footer>

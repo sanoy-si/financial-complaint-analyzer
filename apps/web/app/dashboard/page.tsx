@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import { api, clearToken, getToken, type Project } from "@/lib/api";
 
 export default function DashboardPage() {
@@ -41,7 +42,7 @@ export default function DashboardPage() {
     <div className="app-bg">
       <nav className="nav">
         <div className="nav-inner">
-          <Link href="/dashboard" className="brand"><span className="logo" /> Grounded</Link>
+          <Link href="/dashboard" className="brand"><Logo /> Grounded</Link>
           <button className="btn btn-ghost" onClick={logout}>Log out</button>
         </div>
       </nav>

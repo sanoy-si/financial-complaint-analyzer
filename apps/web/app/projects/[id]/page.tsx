@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import {
   api,
   getToken,
@@ -46,7 +47,7 @@ export default function ProjectPage() {
     <div className="app-bg">
       <nav className="nav">
         <div className="nav-inner">
-          <Link href="/dashboard" className="brand"><span className="logo" /> Grounded</Link>
+          <Link href="/dashboard" className="brand"><Logo /> Grounded</Link>
           {project && <span className="pill">{project.name}</span>}
         </div>
       </nav>
