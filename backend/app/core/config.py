@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -33,6 +33,17 @@ class Settings(BaseSettings):
     database_url: str = Field(
         default="postgresql+psycopg://grounded:grounded@localhost:5432/grounded"
     )
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg_driver(cls, value: str) -> str:
+        """Managed hosts (Render/Heroku) hand out ``postgres(ql)://`` URLs that
+        SQLAlchemy maps to psycopg2; we ship psycopg v3, so normalise the scheme."""
+        if value.startswith("postgresql://"):
+            return "postgresql+psycopg://" + value[len("postgresql://"):]
+        if value.startswith("postgres://"):
+            return "postgresql+psycopg://" + value[len("postgres://"):]
+        return value
 
     # --- auth ---
     jwt_secret: str = Field(default="dev-only-change-me")

@@ -56,3 +56,11 @@ def test_get_llm_openai_requires_key():
 def test_get_embedder_unknown_raises():
     with pytest.raises(ValueError):
         get_embedder(Settings(embedding_provider="nope"))
+
+
+def test_database_url_normalized_to_psycopg():
+    assert Settings(database_url="postgresql://u:p@h/db").database_url.startswith("postgresql+psycopg://")
+    assert Settings(database_url="postgres://u:p@h/db").database_url.startswith("postgresql+psycopg://")
+    # already-correct and sqlite URLs are left alone
+    assert Settings(database_url="postgresql+psycopg://x").database_url == "postgresql+psycopg://x"
+    assert Settings(database_url="sqlite://").database_url == "sqlite://"
