@@ -23,10 +23,10 @@ const ICONS = {
 };
 
 const STATS = [
-  { num: 10000, suffix: "+",          label: "Documents indexed" },
-  { num: 99,    suffix: "%",           label: "Grounded accuracy" },
-  { num: 1,     suffix: " line",       label: "to embed on your site" },
-  { num: 0,     suffix: " hallucinations", label: "by design" },
+  { num: 10000, suffix: "+", label: "Documents indexed" },
+  { num: 99,    suffix: "%", label: "Grounded accuracy" },
+  { num: 1,     suffix: "",  label: "Line of code to embed" },
+  { num: 0,     suffix: "",  label: "Hallucinations, by design" },
 ];
 
 const HOW = [
@@ -90,10 +90,8 @@ export default function LandingPage() {
               </FadeIn>
               <FadeIn delay={0.07}>
                 <h1 style={{ marginTop: 24 }}>
-                  Turn your documents<br />
-                  into a chatbot your<br />
-                  customers can{" "}
-                  <span className="gradient-text">actually trust</span>.
+                  Turn your documents into a chatbot your customers can{" "}
+                  <span className="gradient-text">actually&nbsp;trust</span>.
                 </h1>
               </FadeIn>
               <FadeIn delay={0.14}>
