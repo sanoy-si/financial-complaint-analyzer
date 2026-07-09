@@ -347,6 +347,38 @@ h1,h2,h3 {
 }
 @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:0 } }
 
+/* ── GOOGLE BUTTON ── */
+.btn-google {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px 20px;
+  border: 1px solid var(--line-hi);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.06);
+  color: var(--ink);
+  font-size: 15px; font-weight: 500; font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .15s;
+  backdrop-filter: blur(8px);
+}
+.btn-google:hover {
+  background: rgba(255,255,255,.1);
+  border-color: rgba(255,255,255,.22);
+  transform: translateY(-1px);
+}
+.btn-google:active { transform: none; }
+
+.auth-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 20px 0 4px;
+  color: var(--muted); font-size: 13px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: ""; flex: 1;
+  height: 1px; background: var(--line);
+}
+
 /* ── FORMS ── */
 .field   { display: flex; flex-direction: column; gap: 6px; }
 .label   { font-size: 13px; font-weight: 600; color: var(--ink-2); }
