@@ -26,4 +26,5 @@ services:
         value: mock
       - key: CORS_ORIGINS
         value: '["*"]'
-    preDeployCommand: alembic upgrade head
+    # Migrations run at container startup (see backend/Dockerfile CMD); free-tier
+    # services don't support preDeployCommand.
