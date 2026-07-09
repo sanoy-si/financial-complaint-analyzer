@@ -133,11 +133,18 @@ h1,h2,h3 {
   max-width: 1100px; margin: 0 auto;
   padding: 14px 24px;
   display: flex; justify-content: space-between; align-items: center;
+  gap: 12px;
 }
 .brand {
   display: flex; align-items: center; gap: 10px;
   font-family: "Sora"; font-weight: 800; font-size: 18px;
   color: var(--ink);
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .nav-inner { padding: 12px 16px; }
+  .nav-inner .btn { padding: 8px 14px; font-size: 13px; }
+  .nav-inner .btn-primary { padding: 8px 16px; }
 }
 .logo-mark {
   display: block;
