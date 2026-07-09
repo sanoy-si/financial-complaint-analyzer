@@ -81,7 +81,7 @@ export default function LandingPage() {
         <div className="hero-grid" />
 
         <div className="hero-inner">
-          <div className="row" style={{ flexWrap: "wrap", gap: 40, alignItems: "flex-start" }}>
+          <div className="row" style={{ flexWrap: "wrap", gap: 48, alignItems: "center" }}>
 
             {/* copy */}
             <div style={{ flex: "1 1 460px" }}>
