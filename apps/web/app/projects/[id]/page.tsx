@@ -3,22 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { motion, AnimatePresence } from "motion/react";
 import { Logo } from "@/components/Logo";
+import { FadeIn } from "@/components/MotionWrap";
 import {
-  api,
-  getToken,
-  API_BASE,
-  type Project,
-  type DocumentItem,
-  type Source,
+  api, getToken, API_BASE,
+  type Project, type DocumentItem, type Source,
 } from "@/lib/api";
 
 type Tab = "content" | "chat" | "embed";
-interface ChatMsg {
-  role: "user" | "assistant";
-  text: string;
-  sources?: Source[];
-}
+interface ChatMsg { role: "user" | "assistant"; text: string; sources?: Source[]; }
 
 export default function ProjectPage() {
   const router = useRouter();
@@ -31,17 +25,18 @@ export default function ProjectPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!getToken()) {
-      router.push("/login");
-      return;
-    }
+    if (!getToken()) { router.push("/login"); return; }
     api.getProject(projectId).then(setProject).catch((e) => setError(e.message));
     api.listDocuments(projectId).then(setDocs).catch(() => undefined);
   }, [projectId, router]);
 
-  async function refreshDocs() {
-    setDocs(await api.listDocuments(projectId));
-  }
+  async function refreshDocs() { setDocs(await api.listDocuments(projectId)); }
+
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "content", label: "Content" },
+    { key: "chat",    label: "Chat" },
+    { key: "embed",   label: "Embed" },
+  ];
 
   return (
     <div className="app-bg">
@@ -52,29 +47,41 @@ export default function ProjectPage() {
         </div>
       </nav>
 
-      <div className="container" style={{ paddingTop: 32, paddingBottom: 60 }}>
-        <Link href="/dashboard" className="muted" style={{ fontSize: 14 }}>← All chatbots</Link>
-        <h1 style={{ fontSize: 30, margin: "8px 0 20px" }}>{project?.name ?? "Project"}</h1>
-        {error && <p className="error">{error}</p>}
+      <div className="container" style={{ paddingTop: 36, paddingBottom: 72 }}>
+        <FadeIn>
+          <Link href="/dashboard" className="muted" style={{ fontSize: 13 }}>← All chatbots</Link>
+          <h1 style={{ fontSize: 30, margin: "10px 0 24px" }}>{project?.name ?? "Project"}</h1>
+          {error && <p className="error">{error}</p>}
 
-        <div className="tabs">
-          {(["content", "chat", "embed"] as Tab[]).map((t) => (
-            <div key={t} className={`tab ${tab === t ? "active" : ""}`} onClick={() => setTab(t)}>
-              {t === "content" ? "Content" : t === "chat" ? "Chat" : "Embed"}
-            </div>
-          ))}
-        </div>
+          <div className="tabs">
+            {TABS.map((t) => (
+              <div key={t.key} className={`tab ${tab === t.key ? "active" : ""}`}
+                onClick={() => setTab(t.key)}>
+                {t.label}
+              </div>
+            ))}
+          </div>
+        </FadeIn>
 
-        <div className="fade-up">
-          {tab === "content" && <ContentTab projectId={projectId} docs={docs} onChange={refreshDocs} />}
-          {tab === "chat" && <ChatTab projectId={projectId} />}
-          {tab === "embed" && project && <EmbedTab project={project} />}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22 }}
+          >
+            {tab === "content" && <ContentTab projectId={projectId} docs={docs} onChange={refreshDocs} />}
+            {tab === "chat"    && <ChatTab projectId={projectId} />}
+            {tab === "embed"   && project && <EmbedTab project={project} />}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
+/* ── CONTENT TAB ─────────────────────────────────── */
 function ContentTab({ projectId, docs, onChange }: {
   projectId: string; docs: DocumentItem[]; onChange: () => void;
 }) {
@@ -102,47 +109,60 @@ function ContentTab({ projectId, docs, onChange }: {
   }
 
   return (
-    <div className="grid" style={{ gridTemplateColumns: "1fr", gap: 24 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div className="card">
-        <h3 style={{ fontSize: 18 }}>Add content</h3>
-        <p className="muted" style={{ marginTop: 4, fontSize: 14 }}>Paste a public URL or upload a PDF. We index it instantly.</p>
-        <form onSubmit={addUrl} className="row" style={{ marginTop: 14 }}>
-          <input className="input" placeholder="https://example.com/page" value={url} onChange={(e) => setUrl(e.target.value)} />
+        <h3 style={{ fontSize: 18, marginBottom: 6 }}>Add content</h3>
+        <p className="muted" style={{ fontSize: 14, marginBottom: 16 }}>Paste a public URL or upload a PDF. We index it instantly.</p>
+        <form onSubmit={addUrl} className="row" style={{ marginBottom: 12 }}>
+          <input className="input" placeholder="https://example.com/page"
+            value={url} onChange={(e) => setUrl(e.target.value)} style={{ flex: 1 }} />
           <button className="btn btn-primary" type="submit" disabled={busy}>Add URL</button>
         </form>
-        <div className="row" style={{ marginTop: 12 }}>
-          <input ref={fileRef} type="file" accept="application/pdf" style={{ fontSize: 14 }} />
+        <div className="row">
+          <input ref={fileRef} type="file" accept="application/pdf"
+            style={{ fontSize: 14, color: "var(--muted)", flex: 1 }} />
           <button className="btn btn-ghost" onClick={addPdf} disabled={busy}>Upload PDF</button>
         </div>
-        {busy && <p className="muted" style={{ marginTop: 10 }}>Indexing…</p>}
-        {error && <p className="error">{error}</p>}
+        {busy && <p className="muted" style={{ marginTop: 12, fontSize: 14 }}>Indexing…</p>}
+        {error && <p className="error" style={{ marginTop: 8 }}>{error}</p>}
       </div>
 
       <div>
-        <h3 style={{ fontSize: 18, marginBottom: 12 }}>Indexed documents</h3>
+        <h3 style={{ fontSize: 18, marginBottom: 14 }}>Indexed documents</h3>
         {docs.length === 0 ? (
           <div className="empty">Nothing indexed yet — add a URL or PDF above.</div>
         ) : (
-          docs.map((d) => (
-            <div key={d.id} className="doc-item">
-              <span className={`dot ${d.status}`} />
-              <span className="pill">{d.source_type}</span>
-              <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.source_ref}</span>
-              <span className="muted" style={{ fontSize: 13 }}>{d.status}</span>
-              {d.error && <span className="error" style={{ fontSize: 12 }}>· {d.error}</span>}
-            </div>
-          ))
+          <AnimatePresence>
+            {docs.map((d) => (
+              <motion.div key={d.id} className="doc-item"
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <span className={`dot ${d.status}`} />
+                <span className="pill">{d.source_type}</span>
+                <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 14 }}>
+                  {d.source_ref}
+                </span>
+                <span className="muted" style={{ fontSize: 13 }}>{d.status}</span>
+                {d.error && <span className="error" style={{ fontSize: 12 }}>· {d.error}</span>}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>
   );
 }
 
+/* ── CHAT TAB ─────────────────────────────────────── */
 function ChatTab({ projectId }: { projectId: string }) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
+  const logRef = useRef<HTMLDivElement>(null);
   const sessionId = useMemo(() => "play_" + Math.random().toString(36).slice(2, 10), []);
+
+  useEffect(() => {
+    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, busy]);
 
   async function ask(e: React.FormEvent) {
     e.preventDefault();
@@ -160,52 +180,63 @@ function ChatTab({ projectId }: { projectId: string }) {
 
   return (
     <div>
-      <div className="chat-log">
+      <div className="chat-log" ref={logRef}>
         {messages.length === 0 ? (
-          <p className="muted" style={{ margin: "auto" }}>Ask anything grounded in this project&apos;s content.</p>
+          <p className="muted" style={{ margin: "auto", textAlign: "center", fontSize: 14 }}>
+            Ask anything grounded in this project&apos;s content.
+          </p>
         ) : (
-          messages.map((m, i) => (
-            <div key={i} className={`msg ${m.role}`}>
-              {m.text}
-              {m.sources && m.sources.length > 0 && (
-                <div className="src">📎 {m.sources.length} source passage(s)</div>
-              )}
-            </div>
-          ))
+          <AnimatePresence initial={false}>
+            {messages.map((m, i) => (
+              <motion.div key={i} className={`msg ${m.role}`}
+                initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 28 }}>
+                {m.text}
+                {m.sources && m.sources.length > 0 && (
+                  <div className="src">📎 {m.sources.length} source passage(s)</div>
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
-        {busy && <div className="msg bot">…</div>}
+        {busy && (
+          <motion.div className="msg bot" initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            style={{ fontSize: 20, letterSpacing: 6 }}>···</motion.div>
+        )}
       </div>
       <form onSubmit={ask} className="composer">
-        <input className="input" placeholder="Type a question…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="input" placeholder="Type a question…"
+          value={q} onChange={(e) => setQ(e.target.value)} style={{ flex: 1 }} />
         <button className="btn btn-primary" type="submit" disabled={busy}>Send</button>
       </form>
     </div>
   );
 }
 
+/* ── EMBED TAB ────────────────────────────────────── */
 function EmbedTab({ project }: { project: Project }) {
   const [copied, setCopied] = useState(false);
-  const snippet = `<script src="${API_BASE}/widget.js"
-        data-project-key="${project.public_key}"
-        data-api-base="${API_BASE}"></script>`;
+  const snippet = `<script src="${API_BASE}/widget.js"\n  data-project-key="${project.public_key}"\n  data-api-base="${API_BASE}"></script>`;
 
   function copy() {
     navigator.clipboard.writeText(snippet);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 1800);
   }
 
   return (
-    <div className="card">
+    <div className="card" style={{ maxWidth: 640 }}>
       <h3 style={{ fontSize: 18 }}>Embed on your site</h3>
-      <p className="muted" style={{ marginTop: 4, fontSize: 14 }}>
-        Paste this just before the closing <code>&lt;/body&gt;</code> tag on any page. The chat
-        bubble appears in the corner, scoped to this project.
+      <p className="muted" style={{ marginTop: 6, fontSize: 14, lineHeight: 1.6 }}>
+        Paste this just before the closing <code>&lt;/body&gt;</code> tag on any page.
+        The chat bubble appears in the corner, scoped to this project.
       </p>
-      <pre className="pre" style={{ marginTop: 14 }}>{snippet}</pre>
-      <button className="btn btn-primary" onClick={copy} style={{ marginTop: 12 }}>
-        {copied ? "Copied ✓" : "Copy snippet"}
-      </button>
+      <pre className="pre" style={{ marginTop: 18 }}>{snippet}</pre>
+      <motion.button className="btn btn-primary" onClick={copy}
+        style={{ marginTop: 14 }} whileTap={{ scale: 0.96 }}>
+        {copied ? "✓ Copied!" : "Copy snippet"}
+      </motion.button>
     </div>
   );
 }

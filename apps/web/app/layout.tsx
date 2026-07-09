@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Grounded — chat with your documents",
   description:
     "Turn any PDF or website into a grounded chatbot, with an embeddable widget for your own site.",
+  themeColor: "#07070f",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
