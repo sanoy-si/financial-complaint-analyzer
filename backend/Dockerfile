@@ -13,6 +13,7 @@ COPY . /app
 
 EXPOSE 8000
 
-# Shell form so $PORT (injected by Render and other PaaS) is honoured; falls back
-# to 8000 for local runs.
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# start.sh: runs alembic upgrade, falls back to create_all if tables are
+# missing (handles SA 2.0 + psycopg3 transaction edge cases), then starts
+# uvicorn with the PaaS-injected $PORT.
+CMD ["sh", "start.sh"]
