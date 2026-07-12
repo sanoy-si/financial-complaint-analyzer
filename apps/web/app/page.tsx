@@ -106,7 +106,7 @@ export default function LandingPage() {
                   <Link className="btn btn-primary btn-lg" href="/signup">
                     Create your first bot →
                   </Link>
-                  <Link className="btn btn-ghost btn-lg" href="/login">
+                  <Link className="btn btn-ghost btn-lg" href="/demo">
                     See live demo
                   </Link>
                 </div>

@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     # --- product ---
     product_name: str = Field(default="Grounded")
     environment: str = Field(default="development")
+    # Owner of the public, no-login demo datasets surfaced at ``/public/demos``.
+    demo_user_email: str = Field(default="demo@grounded.app")
 
     # --- api ---
     api_v1_prefix: str = "/api/v1"

@@ -71,6 +71,12 @@ export interface ChatResult {
   session_id: string;
 }
 
+export interface DemoBot {
+  name: string;
+  public_key: string;
+  sample_questions: string[];
+}
+
 export const api = {
   signup: (email: string, password: string) =>
     request<{ access_token: string }>("/auth/signup", {
@@ -118,6 +124,18 @@ export const api = {
     request<ChatResult>(`/projects/${projectId}/chat`, {
       method: "POST",
       body: JSON.stringify({ question, session_id: sessionId }),
+    }),
+
+  // --- public, no-login demo (key-authenticated) ---
+  listDemos: () => request<DemoBot[]>("/public/demos"),
+  publicChat: (publicKey: string, question: string, sessionId?: string) =>
+    request<ChatResult>("/public/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        public_key: publicKey,
+        question,
+        session_id: sessionId,
+      }),
     }),
 };
 
